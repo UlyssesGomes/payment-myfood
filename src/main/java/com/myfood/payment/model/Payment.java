@@ -10,6 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name="payments")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,17 +22,13 @@ public class Payment {
     private Long id;
     @NotNull
     @Positive
-    private BigDecimal value;
-    @NotBlank
+    private BigDecimal paymentValue;
     @Size(max=200)
     private String name;
-    @NotBlank
     @Size(max=19)
     private String number;
-    @NotBlank
     @Size(max=7)
     private String expirationDate;
-    @NotBlank
     @Size(min=3, max=3)
     private String code;
     @NotNull
