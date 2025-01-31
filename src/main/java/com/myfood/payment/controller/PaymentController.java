@@ -1,7 +1,9 @@
 package com.myfood.payment.controller;
 
 import com.myfood.payment.dto.PaymentDTO;
+import com.myfood.payment.dto.PaymentWithDetailsDTO;
 import com.myfood.payment.service.PaymentService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,13 @@ public class PaymentController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/{id}/details")
+    @CircuitBreaker(name = "orderService", fallbackMethod = "")
+    public ResponseEntity<PaymentWithDetailsDTO> getPaymentByIdWithDetails(@PathVariable @NotNull Long id) {
+        PaymentWithDetailsDTO dto = service.getByIdWithDetails(id);
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping
     public ResponseEntity<PaymentDTO> createPayment(@RequestBody @Valid PaymentDTO dto, UriComponentsBuilder uriBuilder) {
         PaymentDTO paymentDTO = service.create(dto);
@@ -48,5 +57,15 @@ public class PaymentController {
     public ResponseEntity deletePaymentById(@PathVariable @NotNull Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/confirm")
+    @CircuitBreaker(name = "orderService", fallbackMethod = "paymentAuthorizedWithIntegrationPending")
+    public void confirmPayment(@PathVariable @NotNull Long id) {
+        service.confirmPayment(id);
+    }
+
+    public void paymentAuthorizedWithIntegrationPending(Long id, Exception e) {
+        service.changeStatus(id);
     }
 }

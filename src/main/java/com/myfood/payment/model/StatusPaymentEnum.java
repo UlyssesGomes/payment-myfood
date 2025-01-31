@@ -2,6 +2,7 @@ package com.myfood.payment.model;
 
 public enum StatusPaymentEnum {
     CREATED,
-    CONFIMED,
+    CONFIRMED,
+    CONFIRMED_WITHOUT_INTEGRATION,
     CANCELED
 }
